@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class MOONSEONGHAE_API AWeapon : public AItemClass
+class MOONSEONGHAE_API AWeapon : public AItemClass //이 구문에서 이파일은 ItemClass 를 상속 받았다는것을 알수 있음
 {
 	GENERATED_BODY()
 	
