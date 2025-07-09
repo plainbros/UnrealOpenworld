@@ -47,5 +47,5 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> ItemMesh;
 private:
-
+	//깃허브 테스트
 };
