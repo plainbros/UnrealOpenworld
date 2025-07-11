@@ -9,6 +9,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Actor/ItemClass.h"
+#include "Actor/Weapon/Weapon.h"
 
 AMyCharacter::AMyCharacter()
 {
@@ -65,6 +67,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
         // LookAction을 바인딩합니다.
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMyCharacter::Look);
+
+        EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &AMyCharacter::EPressed);
     }
 }
 
@@ -104,4 +108,14 @@ void AMyCharacter::StopJump(const FInputActionValue& Value)
 {
     // ACharacter에 내장된 StopJumping 함수를 호출합니다.
     StopJumping();
+}
+
+void AMyCharacter::EPressed(const FInputActionValue& Value)
+{
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("1. E Key Pressed!"));
+    AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+    if (OverlappingWeapon)
+    {
+        OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
+    }
 }

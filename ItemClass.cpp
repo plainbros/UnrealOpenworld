@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/PrimitiveComponent.h" 
+#include "MyCharacter.h"
 
 AItemClass::AItemClass()
 {
@@ -62,11 +63,11 @@ float AItemClass::TransformCos()
 
 
 void AItemClass::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (GEngine)
+{	
+	AMyCharacter* MyCharacter = Cast<AMyCharacter>(OtherActor);
+	if (MyCharacter)
 	{
-		const FString OtherActorName = OtherActor->GetName();
-		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red, OtherActorName);
+		MyCharacter->SetOverlappingItem(this);
 	}
 }
 
@@ -75,8 +76,11 @@ void AItemClass:: OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, A
 {
 	if (GEngine)
 	{
-		const FString OtherActorName = OtherActor->GetName();
-		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Blue, FString(TEXT("Ending Overlab With ") + OtherActorName));
+		AMyCharacter* MyCharacter = Cast<AMyCharacter>(OtherActor);
+		if (MyCharacter)
+		{
+			MyCharacter->SetOverlappingItem(nullptr);
+		}
 	}
 	
 }
