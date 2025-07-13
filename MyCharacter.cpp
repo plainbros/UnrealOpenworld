@@ -112,10 +112,11 @@ void AMyCharacter::StopJump(const FInputActionValue& Value)
 
 void AMyCharacter::EPressed(const FInputActionValue& Value)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("1. E Key Pressed!"));
+    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("1. E Key Pressed!"));
     AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
     if (OverlappingWeapon)
     {
         OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
+        CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
     }
 }

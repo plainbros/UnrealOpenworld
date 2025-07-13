@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Character/CharacterType.h"
 #include "MyCharacter.generated.h"
 
 class UInputMappingContext;
@@ -12,7 +13,6 @@ class UInputAction;
 class USpringArmComponent;
 class UCameraComponent;
 class AItemClass;
-
 
 UCLASS()
 class MOONSEONGHAE_API AMyCharacter : public ACharacter
@@ -36,6 +36,9 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
@@ -56,6 +59,7 @@ private:
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItemClass* Item) { OverlappingItem = Item; }
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
 
 protected:
