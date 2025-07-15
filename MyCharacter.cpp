@@ -1,30 +1,31 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "MyCharacter.h"
 #include "Components/InputComponent.h"
-#include "EnhancedInputComponent.h"       // UEnhancedInputComponent »ç¿ë
-#include "EnhancedInputSubsystems.h"    // UEnhancedInputLocalPlayerSubsystem »ç¿ë
-#include "Engine/LocalPlayer.h"         // ULocalPlayer »ç¿ë
+#include "EnhancedInputComponent.h"       // UEnhancedInputComponent ì‚¬ìš©
+#include "EnhancedInputSubsystems.h"    // UEnhancedInputLocalPlayerSubsystem ì‚¬ìš©
+#include "Engine/LocalPlayer.h"         // ULocalPlayer ì‚¬ìš©
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Actor/ItemClass.h"
 #include "Actor/Weapon/Weapon.h"
+#include "Animation/AnimMontage.h"
 
 AMyCharacter::AMyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-    // Ä«¸Ş¶ó ºÕ(½ºÇÁ¸µ¾Ï) »ı¼º
+    // ì¹´ë©”ë¼ ë¶(ìŠ¤í”„ë§ì•”) ìƒì„±
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-    SpringArm->SetupAttachment(GetRootComponent()); // Ä¸½¶ ÄÄÆ÷³ÍÆ®¿¡ ºÎÂø
-    SpringArm->TargetArmLength = 300.0f; // Ä«¸Ş¶ó¿Í Ä³¸¯ÅÍ »çÀÌÀÇ °Å¸®
-    SpringArm->bUsePawnControlRotation = true; // ÄÁÆ®·Ñ·¯ÀÇ È¸Àü(¸¶¿ì½º ¿òÁ÷ÀÓ)À» ½ºÇÁ¸µ¾Ï¿¡ Àû¿ë
+    SpringArm->SetupAttachment(GetRootComponent()); // ìº¡ìŠ ì»´í¬ë„ŒíŠ¸ì— ë¶€ì°©
+    SpringArm->TargetArmLength = 300.0f; // ì¹´ë©”ë¼ì™€ ìºë¦­í„° ì‚¬ì´ì˜ ê±°ë¦¬
+    SpringArm->bUsePawnControlRotation = true; // ì»¨íŠ¸ë¡¤ëŸ¬ì˜ íšŒì „(ë§ˆìš°ìŠ¤ ì›€ì§ì„)ì„ ìŠ¤í”„ë§ì•”ì— ì ìš©
 
-    // ÆÈ·Î¿ì Ä«¸Ş¶ó »ı¼º
+    // íŒ”ë¡œìš° ì¹´ë©”ë¼ ìƒì„±
     FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-    FollowCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName); // ½ºÇÁ¸µ¾Ï ³¡¿¡ ºÎÂø
-    FollowCamera->bUsePawnControlRotation = false; // Ä«¸Ş¶ó´Â ½ºÇÁ¸µ¾ÏÀÇ È¸ÀüÀ» µû¶ó°¡¹Ç·Î, Á÷Á¢ ÄÁÆ®·Ñ·¯ È¸ÀüÀ» ¹ŞÁö ¾Êµµ·Ï ÇÔ
+    FollowCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName); // ìŠ¤í”„ë§ì•” ëì— ë¶€ì°©
+    FollowCamera->bUsePawnControlRotation = false; // ì¹´ë©”ë¼ëŠ” ìŠ¤í”„ë§ì•”ì˜ íšŒì „ì„ ë”°ë¼ê°€ë¯€ë¡œ, ì§ì ‘ ì»¨íŠ¸ë¡¤ëŸ¬ íšŒì „ì„ ë°›ì§€ ì•Šë„ë¡ í•¨
 
 }
 
@@ -36,7 +37,7 @@ void AMyCharacter::BeginPlay()
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
-            // À§¿¡¼­ ¸¸µç ±âº» ¸ÅÇÎ ÄÁÅØ½ºÆ®¸¦ Ãß°¡ÇÕ´Ï´Ù.
+            // ìœ„ì—ì„œ ë§Œë“  ê¸°ë³¸ ë§¤í•‘ ì»¨í…ìŠ¤íŠ¸ë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
             Subsystem->AddMappingContext(DefaultMappingContext, 0);
         }
     }
@@ -52,34 +53,36 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-    // PlayerInputComponent¸¦ UEnhancedInputComponent·Î Ä³½ºÆÃÇÕ´Ï´Ù.
+    // PlayerInputComponentë¥¼ UEnhancedInputComponentë¡œ ìºìŠ¤íŒ…í•©ë‹ˆë‹¤.
     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
     {
-        // JumpActionÀ» ¹ÙÀÎµùÇÕ´Ï´Ù.
-        // ETriggerEvent::Triggered: ´©¸£´Â ¼ø°£
-        // ETriggerEvent::Completed: ¶¼´Â ¼ø°£
+        // JumpActionì„ ë°”ì¸ë”©í•©ë‹ˆë‹¤.
+        // ETriggerEvent::Triggered: ëˆ„ë¥´ëŠ” ìˆœê°„
+        // ETriggerEvent::Completed: ë–¼ëŠ” ìˆœê°„
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AMyCharacter::StartJump);
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMyCharacter::StopJump);
 
-        // MoveActionÀ» ¹ÙÀÎµùÇÕ´Ï´Ù.
-        // ETriggerEvent::Triggered: Å°°¡ ´­·ÁÀÖ´Â µ¿¾È ¸Å ÇÁ·¹ÀÓ ¹ß»ı
+        // MoveActionì„ ë°”ì¸ë”©í•©ë‹ˆë‹¤.
+        // ETriggerEvent::Triggered: í‚¤ê°€ ëˆŒë ¤ìˆëŠ” ë™ì•ˆ ë§¤ í”„ë ˆì„ ë°œìƒ
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMyCharacter::Move);
 
-        // LookActionÀ» ¹ÙÀÎµùÇÕ´Ï´Ù.
+        // LookActionì„ ë°”ì¸ë”©í•©ë‹ˆë‹¤.
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMyCharacter::Look);
 
         EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &AMyCharacter::EPressed);
+
+        EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMyCharacter::Attack);
     }
 }
 
 void AMyCharacter::Move(const FInputActionValue& Value)
 {
-    // ÀÔ·Â °ªÀº FVector2D Å¸ÀÔÀÔ´Ï´Ù.
+    // ì…ë ¥ ê°’ì€ FVector2D íƒ€ì…ì…ë‹ˆë‹¤.
     FVector2D MovementVector = Value.Get<FVector2D>();
 
     if (Controller != nullptr)
     {
-        // Ä³¸¯ÅÍÀÇ Àü¹æÇâ°ú ¿ì¹æÇâÀ¸·Î ÀÌµ¿À» Ãß°¡ÇÕ´Ï´Ù.
+        // ìºë¦­í„°ì˜ ì „ë°©í–¥ê³¼ ìš°ë°©í–¥ìœ¼ë¡œ ì´ë™ì„ ì¶”ê°€í•©ë‹ˆë‹¤.
         AddMovementInput(GetActorForwardVector(), MovementVector.Y);
         AddMovementInput(GetActorRightVector(), MovementVector.X);
     }
@@ -87,12 +90,12 @@ void AMyCharacter::Move(const FInputActionValue& Value)
 
 void AMyCharacter::Look(const FInputActionValue& Value)
 {
-    // ÀÔ·Â °ªÀº FVector2D Å¸ÀÔÀÔ´Ï´Ù.
+    // ì…ë ¥ ê°’ì€ FVector2D íƒ€ì…ì…ë‹ˆë‹¤.
     FVector2D LookAxisVector = Value.Get<FVector2D>();
 
     if (Controller != nullptr)
     {
-        // ÄÁÆ®·Ñ·¯ÀÇ Yaw, Pitch È¸ÀüÀ» Ãß°¡ÇÕ´Ï´Ù.
+        // ì»¨íŠ¸ë¡¤ëŸ¬ì˜ Yaw, Pitch íšŒì „ì„ ì¶”ê°€í•©ë‹ˆë‹¤.
         AddControllerYawInput(LookAxisVector.X);
         AddControllerPitchInput(LookAxisVector.Y * -1.0f);
     }
@@ -100,14 +103,27 @@ void AMyCharacter::Look(const FInputActionValue& Value)
 
 void AMyCharacter::StartJump(const FInputActionValue& Value)
 {
-    // ACharacter¿¡ ³»ÀåµÈ Jump ÇÔ¼ö¸¦ È£ÃâÇÕ´Ï´Ù.
+    // ACharacterì— ë‚´ì¥ëœ Jump í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•©ë‹ˆë‹¤.
     Jump();
 }
 
 void AMyCharacter::StopJump(const FInputActionValue& Value)
 {
-    // ACharacter¿¡ ³»ÀåµÈ StopJumping ÇÔ¼ö¸¦ È£ÃâÇÕ´Ï´Ù.
+    // ACharacterì— ë‚´ì¥ëœ StopJumping í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•©ë‹ˆë‹¤.
     StopJumping();
+}
+
+void AMyCharacter::Attack(const FInputActionValue& Value)
+{
+    //ActionState ê°€ EAS_Unoccupied ì¼ë•Œ ëª½íƒ€ì£¼ë¥¼ ì‹¤í–‰ í•˜ê³ , ActionStateê°€ EAS_Attackingë¡œ ë°”ë€Œê¸° ë•Œë¬¸ì— ë‹¤ì‹œ ì´ êµ¬ë¬¸ì€ ì‹¤í–‰ ë˜ì§€ ì•ŠìŒ
+    if (ActionState == EActionState::EAS_Unoccupied)
+    {
+        PlayAttackMontage();
+        ActionState = EActionState::EAS_Attacking;
+        //í˜„ì¬ ìƒí™©ì€ ActionState ì˜ ìƒíƒœëŠ” EAS_Attacking ì´ê¸° ë•Œë¬¸ì— ë‹¤ì‹œ ê³µê²© í•  ìˆ˜ê°€ ì—†ëŠ” ìƒíƒœì„
+    }
+    
+    //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Attack!!"));
 }
 
 void AMyCharacter::EPressed(const FInputActionValue& Value)
@@ -118,5 +134,29 @@ void AMyCharacter::EPressed(const FInputActionValue& Value)
     {
         OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
         CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+    }
+}
+
+//ë¦¬íŒ©í† ë§ í•¨ìˆ˜
+void AMyCharacter::PlayAttackMontage()
+{
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    if (AnimInstance && AttackMontage)
+    {
+        AnimInstance->Montage_Play(AttackMontage);
+        const int32 Selection = FMath::RandRange(0, 1);
+        FName SectionName = FName();
+        switch (Selection)
+        {
+        case 0:
+            SectionName = FName("Attack1");
+            break;
+        case 1:
+            SectionName = FName("Attack2");
+            break;
+        default:
+            break;
+        }
+        AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
     }
 }
