@@ -115,8 +115,9 @@ void AMyCharacter::StopJump(const FInputActionValue& Value)
 
 void AMyCharacter::Attack(const FInputActionValue& Value)
 {
-    //ActionState 가 EAS_Unoccupied 일때 몽타주를 실행 하고, ActionState가 EAS_Attacking로 바뀌기 때문에 다시 이 구문은 실행 되지 않음
-    if (ActionState == EActionState::EAS_Unoccupied)
+
+    //CanAttack 함수가 참일때 실행
+    if (CanAttack())
     {
         PlayAttackMontage();
         ActionState = EActionState::EAS_Attacking;
@@ -124,6 +125,21 @@ void AMyCharacter::Attack(const FInputActionValue& Value)
     }
     
     //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Attack!!"));
+}
+
+bool AMyCharacter::CanAttack()
+{
+    //액션 상태가 대기중일때 && 캐릭터 상태가 무기를 착용 하고 있는 경우 함수 작동
+    return ActionState == EActionState::EAS_Unoccupied &&
+        CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+void AMyCharacter::AttackEnd()
+{
+    //공격이 끝나면 액션 상태를 다시 대기중으로 바꿔주는 함수
+    //어택엔드 함수는 캐릭터 몽타주에서 노티파이를 생성 해서 호출 하는 방식이고
+    //몽타주의 노티파이와 C++ 의 어택엔드 함수를 이어 줘야 하는데 애님블루프린트에서 두개를 연결 해줘야 함
+    ActionState = EActionState::EAS_Unoccupied;
 }
 
 void AMyCharacter::EPressed(const FInputActionValue& Value)
@@ -160,3 +176,6 @@ void AMyCharacter::PlayAttackMontage()
         AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
     }
 }
+
+
+
